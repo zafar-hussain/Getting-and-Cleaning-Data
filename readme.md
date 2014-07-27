@@ -1,50 +1,69 @@
-###load plyr package
-library(plyr)
-
-### Clear environment
-rm(list=ls())
+#Getting & Cleaning Data Course Project
+##Brief description.
 
 
-### read data files 
-activity_lables = read.table("activity_labels.txt")
-features = read.table("features.txt")
-X_test = read.table("./test/X_test.txt")
-y_test = read.table("./test/y_test.txt")
-subject_test = read.table("./test/subject_test.txt")
-X_train = read.table("./train/X_train.txt")
-y_train = read.table("./train/y_train.txt")
-subject_train = read.table("./train/subject_train.txt")
+### 30 subjects were provided with Samsung Galaxy S smartphones and their Gyro and acceleration sensors were recorded over a period of time, while performing various activities.
+
+###the requirement for the project are:
+
+1. Merges the training and the test sets to create one data set.
+2. Extracts only the measurements on the mean and standard deviation for each measurement.
+3. Uses descriptive activity names to name the activities in the data set
+4. Appropriately labels the data set with descriptive variable names.
+5. Creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+
+###below are the details, with the code used to process the data.
+
+###only "plyr" package was used to arrange and join the data
+
+    library(plyr)
+
+### First the environment was cleared
+    
+    rm(list=ls())
 
 
-###conbind similar test and train data
-X = rbind(X_test, X_train)
-y = rbind(y_test, y_train)
-subject = rbind(subject_test, subject_train)
+###Data files were read into datasets
+
+    activity_lables = read.table("activity_labels.txt") 
+    features = read.table("features.txt")
+    X_test = read.table("./test/X_test.txt")
+    y_test = read.table("./test/y_test.txt")
+    subject_test = read.table("./test/subject_test.txt")
+    X_train = read.table("./train/X_train.txt")
+    y_train = read.table("./train/y_train.txt")
+    subject_train = read.table("./train/subject_train.txt")
 
 
-### a get the activity lables vai a join between activity_id from y files
-y = join(x = activity_lables, y = y)
-data = X
-colnames(data) = features$V2
-data = cbind(subject, y, data )
-
-### assign colnames 
-colnames(data)[1:3] = c("subject", "activity_id","activity")
+###As the data was provided in 2 separate categories, they were combined
+    X = rbind(X_test, X_train)
+    y = rbind(y_test, y_train)
+    subject = rbind(subject_test, subject_train)
 
 
-###prepare project data by extracting mean and Std solumns from the data
-project_data = data[c(1,3, grep(("mean"), colnames(data)), grep(("std"), colnames(data)))]
-project_data = arrange(project_data, subject, activity)
+### To get the activity labels, a join between activity_id from y files was used
+    y = join(x = activity_lables, y = y)
+    data = X
+    colnames(data) = features$V2
+    data = cbind(subject, y, data )
 
-### write teh project data in to a csv file
-write.csv(project_data,file="project_data.csv", row.names=FALSE)
+### Proper column names were assigned 
+    colnames(data)[1:3] = c("subject", "activity_id","activity")
+
+
+###The mean and Standard deviation columns were extracted
+    project_data = data[c(1,3, grep(("mean"), colnames(data)), grep(("std"), colnames(data)))]
+    project_data = arrange(project_data, subject, activity)
+
+###Finally Project data in to a TXT file. 
+write.table(project_data,file="project_data.txt", row.names=FALSE)
 
 
 
-###prepare averages from the source data usinf aggregate function
+###A separate Tidy data was prepared from the source data using "aggregate" function
 
-averages = aggregate(data[,c(-1, -3)], by=list(subject=data[,1], activity=data[,3]), FUN = mean)
-averages = arrange(averages, subject, activity_id)
+    averages = aggregate(data[,c(-1, -3)], by=list(subject=data[,1], activity=data[,3]), FUN = mean)
+    averages = arrange(averages, subject, activity_id)
 
-###write averages to averages.csv file
-write.csv(averages,file="averages.csv", row.names=FALSE)
+###The averages were written to a TXT file
+    write.table(averages,file="averages.txt", row.names=FALSE)
