@@ -36,8 +36,8 @@ colnames(data)[1:3] = c("subject", "activity_id","activity")
 project_data = data[c(1,3, grep(("mean"), colnames(data)), grep(("std"), colnames(data)))]
 project_data = arrange(project_data, subject, activity)
 
-### write teh project data in to a csv file
-write.csv(project_data,file="project_data.csv", row.names=FALSE)
+### write teh project data in to a txt file
+write.table(project_data,file="project_data.txt", row.names=FALSE)
 
 
 
@@ -46,5 +46,5 @@ write.csv(project_data,file="project_data.csv", row.names=FALSE)
 averages = aggregate(data[,c(-1, -3)], by=list(subject=data[,1], activity=data[,3]), FUN = mean)
 averages = arrange(averages, subject, activity_id)
 
-###write averages to averages.csv file
-write.csv(averages,file="averages.csv", row.names=FALSE)
+###write averages to txt file
+write.txt(averages,file="averages.txt", row.names=FALSE)
